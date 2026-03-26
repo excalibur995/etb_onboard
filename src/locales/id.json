@@ -1,0 +1,88 @@
+{
+  "auth_onboarding": {
+    "landing": {
+      "page_title": "Satu aplikasi lintas negara",
+      "description": "Menghubungkan masyarakat dan budaya di Asia Tenggara, nikmati layanan perbankan tanpa hambatan dengan [NextGen].",
+      "cta_existing_customer": "Saya nasabah Maybank",
+      "cta_new_customer": "Saya baru di Maybank",
+      "cta_guest": "Lanjut sebagai tamu"
+    },
+    "consent": {
+      "page_title": "Persetujuan dan Pengakuan",
+      "description": "Terima kasih telah mengunduh Maybank2u ID...",
+      "checkbox_label": "Saya menyetujui Syarat & Ketentuan serta Pemberitahuan Privasi",
+      "checkbox_error": "Pilihan wajib diisi.",
+      "cta_agree": "Saya setuju & memberikan persetujuan",
+      "cta_download": "Unduh",
+      "cta_done": "Selesai"
+    },
+    "login_username": {
+      "page_title": "Mari masuk ke akun Anda",
+      "username_label": "Username",
+      "username_placeholder": "Masukkan username",
+      "forgot_login": "Lupa detail login?",
+      "cta_next": "Lanjut",
+      "divider": "Belum memiliki akses online banking?",
+      "cta_register_cc": "Daftar dengan kartu kredit",
+      "cta_register_ca": "Daftar dengan rekening tabungan/giro"
+    },
+    "login_password": {
+      "password_label": "Password",
+      "password_placeholder": "Masukkan password",
+      "forgot_password": "Lupa password?",
+      "cta_login": "Masuk",
+      "cta_biometric": "Gunakan biometrik"
+    },
+    "biometric_setup": {
+      "page_title": "Aktifkan biometrik",
+      "description": "Gunakan sidik jari atau Face ID untuk autentikasi yang lebih cepat.",
+      "cta_enable": "Aktifkan sekarang",
+      "cta_skip": "Lewati"
+    },
+    "security_image": {
+      "page_title": "Pilih gambar keamanan",
+      "description": "Gambar ini akan ditampilkan saat Anda login melalui kanal resmi Maybank.",
+      "error_no_selection": "Silakan pilih satu gambar",
+      "cta_next": "Lanjut"
+    },
+    "m2u_create_username": {
+      "page_title": "Buat username Anda",
+      "username_label": "Username",
+      "username_placeholder": "Masukkan username",
+      "validation_length": "Harus terdiri dari 8–20 karakter",
+      "validation_uppercase": "Harus mengandung minimal 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus",
+      "validation_first_char": "Karakter pertama tidak boleh berupa angka",
+      "error_dob": "Username tidak boleh mengandung tanggal lahir"
+    },
+    "m2u_create_password": {
+      "page_title": "Buat password Anda",
+      "new_password_label": "Password baru",
+      "new_password_placeholder": "Masukkan password baru",
+      "confirm_password_label": "Konfirmasi password",
+      "confirm_password_placeholder": "Masukkan kembali password",
+      "validation_length": "Harus terdiri dari 8–20 karakter",
+      "validation_complexity": "Harus mengandung minimal 1 huruf besar, 1 huruf kecil, 1 angka, dan 1 karakter khusus",
+      "validation_no_username": "Tidak boleh sama dengan username Maybank2u Anda",
+      "validation_first_char": "Karakter pertama tidak boleh berupa angka",
+      "validation_match": "Password baru cocok",
+      "error_dob": "Passcode tidak boleh mengandung tanggal lahir",
+      "cta_confirm": "Konfirmasi"
+    },
+    "change_app_notice": {
+      "page_title": "Anda akan berpindah ke [NextGen]",
+      "description": "Login di sini akan mengeluarkan Anda dari aplikasi sebelumnya.",
+      "bullet_1": "Perangkat ini akan menjadi satu-satunya perangkat yang login.",
+      "bullet_2": "Anda tidak akan dapat login di aplikasi sebelumnya.",
+      "bullet_3": "Untuk kenyamanan Anda, pastikan nomor ponsel resmi dan aplikasi berada di perangkat yang sama.",
+      "cta_proceed": "Lanjutkan"
+    },
+    "display_name": {
+      "page_title": "Selamat datang kembali, {{name}}",
+      "description": "Beritahu kami bagaimana Anda ingin dipanggil. Nama ini juga akan terlihat oleh pengguna aplikasi [NextGen] lainnya.",
+      "field_label": "Nama tampilan",
+      "field_placeholder": "Masukkan nama tampilan",
+      "cta_save": "Simpan & lanjut",
+      "cta_skip": "Atur nanti"
+    }
+  }
+}

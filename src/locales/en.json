@@ -1,0 +1,88 @@
+{
+  "auth_onboarding": {
+    "landing": {
+      "page_title": "One app across borders",
+      "description": "Bridging people and cultures in Southeast Asia, bank seamlessly with [NextGen].",
+      "cta_existing_customer": "I'm a Maybank customer",
+      "cta_new_customer": "I'm new to Maybank",
+      "cta_guest": "Continue as guest"
+    },
+    "consent": {
+      "page_title": "Acknowledgement and consent",
+      "description": "Thank you for downloading Maybank2u ID...",
+      "checkbox_label": "I agree to the Terms & Conditions and Privacy Notice",
+      "checkbox_error": "Required selection.",
+      "cta_agree": "I agree & consent",
+      "cta_download": "Download",
+      "cta_done": "Done"
+    },
+    "login_username": {
+      "page_title": "Let's get you logged in",
+      "username_label": "Username",
+      "username_placeholder": "Enter username",
+      "forgot_login": "Forgot login details?",
+      "cta_next": "Next",
+      "divider": "No online banking access yet?",
+      "cta_register_cc": "Register with credit card",
+      "cta_register_ca": "Register with current/savings account"
+    },
+    "login_password": {
+      "password_label": "Password",
+      "password_placeholder": "Enter password",
+      "forgot_password": "Forgot password?",
+      "cta_login": "Log in",
+      "cta_biometric": "Use biometric instead"
+    },
+    "biometric_setup": {
+      "page_title": "Enable biometrics",
+      "description": "Use your fingerprint or face ID for quick authentication.",
+      "cta_enable": "Enable now",
+      "cta_skip": "Skip"
+    },
+    "security_image": {
+      "page_title": "Choose a security image",
+      "description": "This image will display when you log in on legitimate Maybank channels.",
+      "error_no_selection": "Please select one image",
+      "cta_next": "Next"
+    },
+    "m2u_create_username": {
+      "page_title": "Create your username",
+      "username_label": "Username",
+      "username_placeholder": "Enter username",
+      "validation_length": "Must contain 8–20 characters",
+      "validation_uppercase": "Must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character",
+      "validation_first_char": "First character must not be a number",
+      "error_dob": "Username must not contain date of birth"
+    },
+    "m2u_create_password": {
+      "page_title": "Create your password",
+      "new_password_label": "New password",
+      "new_password_placeholder": "Enter new password",
+      "confirm_password_label": "Confirm password",
+      "confirm_password_placeholder": "Re-enter password",
+      "validation_length": "Must contain 8–20 characters",
+      "validation_complexity": "Must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character",
+      "validation_no_username": "Must not match your Maybank2u username",
+      "validation_first_char": "First character must not be a number",
+      "validation_match": "New passwords match",
+      "error_dob": "Passcode must not contain date of birth",
+      "cta_confirm": "Confirm"
+    },
+    "change_app_notice": {
+      "page_title": "You are moving to [NextGen]",
+      "description": "Logging in here will log you out of your previous app.",
+      "bullet_1": "This will be your sole logged in device.",
+      "bullet_2": "You will not be able to log in on your previous app.",
+      "bullet_3": "For your convenience, ensure your official mobile number and app are on the same device.",
+      "cta_proceed": "Proceed"
+    },
+    "display_name": {
+      "page_title": "Welcome back, {{name}}",
+      "description": "Let us know how you would like to be addressed. The name will also be seen by other [NextGen] app users.",
+      "field_label": "Display name",
+      "field_placeholder": "Enter display name",
+      "cta_save": "Save & next",
+      "cta_skip": "Set up later"
+    }
+  }
+}
