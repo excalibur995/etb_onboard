@@ -95,3 +95,248 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+---
+
+# App Flow — Journey API to End Journey
+
+## Overview
+
+ETB Onboard is a **backend-driven onboarding system**. All journeys and screen UIs are fetched from a Strapi CMS at runtime, allowing screens and flows to be updated without shipping a new app release.
+
+```
+App Start
+  └── SplashScreen
+        └── LoginScreen
+              └── JourneyLauncher        ← Journey API called here
+                    └── ETBOnboardCCRegisterJourney (Navigator)
+                          └── DynamicScreenZone  ← Screen API called here (per screen)
+                                └── [repeat for each step]
+                                      └── End Journey → Reset to LoginScreen
+```
+
+---
+
+## Step 1 — App Start & Splash
+
+**Files:** `App.tsx`, `src/screens/SplashScreen.tsx`, `src/navigation/MainNavigator.tsx`
+
+1. App boots into `MainNavigator`, which wraps navigation inside a `QueryClientProvider`.
+2. `SplashScreen` plays a 2.2s animation and preloads language/translation data.
+3. After the splash, the user lands on `LoginScreen`.
+
+---
+
+## Step 2 — Login & Journey Selection
+
+**File:** `src/screens/LoginScreen.tsx`
+
+The user taps a button (e.g., "Existing Customer"), which navigates to `JourneyLauncher` with a `journeyId` parameter:
+
+```
+journeyId = 'PLAT_AUTH_ONBOARDING'
+```
+
+---
+
+## Step 3 — Journey API Call
+
+**Files:** `src/screens/JourneyLauncher.tsx`, `src/utils/api/journey.ts`, `src/utils/queries/journeyQueries.ts`
+
+`JourneyLauncher` calls the Journey API to fetch journey configuration.
+
+### API Endpoint
+
+```
+GET /api/journeys/{journeyId}
+```
+
+### What It Returns
+
+| Field | Description |
+|---|---|
+| `journeyId` | Unique identifier (e.g., `PLAT_AUTH_ONBOARDING`) |
+| `navigator` | Navigator component to use (e.g., `ETBOnboardCCRegisterJourney`) |
+| `screens[]` | Ordered list of screen IDs in the journey |
+| `steps[]` | Workflow steps — either `user` (user-driven) or `system` (auto API calls) |
+| `initialState` | Default values for journey state |
+| `onExit` | Action to run when the user exits mid-journey |
+| `preInitiateScreen` | Screen to return to when the journey finishes |
+
+### Caching & Fallback
+
+- Uses **React Query** with `staleTime: 0` (always re-fetches on focus).
+- If the API is unreachable, falls back to bundled journey config in `src/utils/config/fallbackJourney.ts`.
+
+### After Journey Fetch
+
+`JourneyLauncher` initializes a **session** in the Zustand store:
+
+```json
+{
+  "currentScreenIndex": 0,
+  "journeyState": {}
+}
+```
+
+This session is also persisted to **MMKV** local storage so it survives app restarts.
+
+Then, navigation resets to the journey navigator (`ETBOnboardCCRegisterJourney`).
+
+---
+
+## Step 4 — Screen API Call (per screen)
+
+**Files:** `src/components/core/DynamicScreenZone.tsx`, `src/utils/api/journey.ts`
+
+The journey navigator renders `DynamicScreenZone` for the current screen in `journey.screens[]`.
+
+### API Endpoint
+
+```
+GET /api/screens/{screenId}?locale={language}
+```
+
+### What It Returns (Server-Driven UI)
+
+Each screen is fully described by the API — no hardcoded layout per screen.
+
+| Zone | Contents |
+|---|---|
+| `meta` | Title, subtitle, show/hide back button, show/hide close button |
+| `header[]` | Components rendered at the top (e.g., hero images) |
+| `body[]` | Main scrollable content (text, inputs, checkboxes, etc.) |
+| `footer[]` | Buttons and actions anchored at the bottom |
+
+Every component has a `__component` field that maps to a registered React Native widget:
+
+```
+"ui.button"        → ButtonWidget
+"ui.text-input"    → TextInputWidget
+"ui.checkbox-list" → CheckboxListWidget
+"ui.radio-group"   → RadioGroupWidget
+... and 20+ more
+```
+
+Component registry: `src/components/registry/ComponentRegistry.ts`
+
+### State Binding
+
+Widgets bind their value to `journeyState` via a `binding` field:
+
+```json
+{
+  "binding": {
+    "scope": "journeyState",
+    "path": "username"
+  }
+}
+```
+
+When the user fills in a field, the value is written into `journeyState.username` in the session store.
+
+### Validation
+
+Footer buttons check validation rules against `journeyState` before allowing forward navigation. If validation fails, navigation is blocked and an error is shown inline.
+
+---
+
+## Step 5 — Navigation Between Screens
+
+**File:** `src/hooks/useJourneyNavigation.ts`
+
+When the user taps a button, a navigation action fires with a direction:
+
+| Direction | Behavior |
+|---|---|
+| `NEXT` | Move to the next screen in `journey.screens[]` |
+| `BACK` | Move to the previous screen |
+| `JUMP` | Jump to a specific screen by `screenId` |
+| `FINISH` | End the journey |
+
+### User Steps vs System Steps
+
+Each screen maps to a `step` in `journey.steps[]`:
+
+- **`user` step** — waits for user interaction. On button press, resolves the action to a direction and navigates.
+- **`system` step** — automatically calls a backend service (e.g., `identity-service.verifyCreditCard`). On success/failure, follows the configured next direction.
+
+System step execution: `src/utils/stepExecutor.ts`
+
+---
+
+## Step 6 — Repeat Per Screen
+
+For each screen in the journey:
+
+1. `DynamicScreenZone` calls `useScreen(screenId)` → fetches screen SDUI from API.
+2. Screen is rendered using the component registry.
+3. User interacts (fills inputs, makes selections) → values written to `journeyState`.
+4. User taps footer button → validation runs.
+5. Navigation hook resolves the next direction.
+6. Session updated: `currentScreenIndex` increments, `journeyState` is merged.
+7. Next screen is rendered.
+
+---
+
+## Step 7 — End Journey
+
+**Files:** `src/hooks/useJourneyNavigation.ts`, `src/store/useJourneyStore.ts`
+
+When a step resolves to direction `FINISH`:
+
+1. **Session is cleared:**
+   - Removed from MMKV storage (key: `journey-session::{journeyId}`)
+   - Removed from Zustand in-memory store
+
+2. **Navigation resets** to the `preInitiateScreen` (typically `LoginScreen`), or a specific target screen if defined in the FINISH action. The stack is fully cleared — the user cannot navigate back into the journey.
+
+---
+
+## Complete Flow Summary
+
+```
+1.  App starts → SplashScreen (animation + language preload)
+2.  Navigate to LoginScreen
+3.  User taps "Existing Customer"
+4.  JourneyLauncher fetches journey:
+        GET /api/journeys/PLAT_AUTH_ONBOARDING
+5.  Session initialized: { currentScreenIndex: 0, journeyState: {} }
+6.  Navigate into ETBOnboardCCRegisterJourney
+7.  DynamicScreenZone fetches first screen:
+        GET /api/screens/PLAT_AUTH_CONSENT
+8.  Screen rendered: header + body (text, checkbox) + footer (button)
+9.  User accepts consent → journeyState.consentAccepted = true
+10. User taps "Next" → validation passes → navigate(NEXT)
+11. Session updated: currentScreenIndex = 1
+12. DynamicScreenZone fetches next screen:
+        GET /api/screens/PLAT_AUTH_LOGIN_USERNAME
+13. [Repeat steps 8–12 for each screen in journey.screens[]]
+14. Last step resolves direction = FINISH
+15. clearSession('PLAT_AUTH_ONBOARDING')
+16. navigation.reset → back to LoginScreen
+```
+
+---
+
+## Key Files Reference
+
+| Purpose | File |
+|---|---|
+| App entry | `App.tsx` |
+| Navigation setup | `src/navigation/MainNavigator.tsx` |
+| Splash screen | `src/screens/SplashScreen.tsx` |
+| Login / journey entry | `src/screens/LoginScreen.tsx` |
+| Journey initialization | `src/screens/JourneyLauncher.tsx` |
+| Journey navigator | `src/navigation/ETBOnboardCCRegisterJourney.tsx` |
+| Screen renderer | `src/components/core/DynamicScreenZone.tsx` |
+| Component zone renderer | `src/components/core/DynamicZoneRenderer.tsx` |
+| Journey & Screen API calls | `src/utils/api/journey.ts` |
+| HTTP client (ETag caching) | `src/utils/api/client.ts` |
+| React Query hooks | `src/utils/queries/journeyQueries.ts` |
+| Navigation logic | `src/hooks/useJourneyNavigation.ts` |
+| System step executor | `src/utils/stepExecutor.ts` |
+| Session & state store | `src/store/useJourneyStore.ts` |
+| Component registry | `src/components/registry/ComponentRegistry.ts` |
+| Offline fallback config | `src/utils/config/fallbackJourney.ts` |
+| TypeScript types | `src/types/api.ts` |
